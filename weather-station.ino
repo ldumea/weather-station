@@ -68,7 +68,8 @@ void sensor_init()
 
 
   //if set LTR390_MODE_ALS,get ambient light data, if set LTR390_MODE_UVS,get ultraviolet light data.
-	ltr.setMode(LTR390_MODE_ALS); //LTR390_MODE_UVS
+	// ltr.setMode(LTR390_MODE_ALS); //LTR390_MODE_UVS
+	ltr.setMode(LTR390_MODE_UVS); //
 	if (ltr.getMode() == LTR390_MODE_ALS)
 	{
 		Serial.println("In ALS mode");
@@ -78,7 +79,7 @@ void sensor_init()
 		Serial.println("In UVS mode");
 	}
 
-	ltr.setGain(LTR390_GAIN_3);
+	ltr.setGain(LTR390_GAIN_18);
 	Serial.print("Gain : ");
 	switch (ltr.getGain())
 	{
@@ -101,7 +102,7 @@ void sensor_init()
 		Serial.println("Failed to set gain");
 		break;
 	}
-	ltr.setResolution(LTR390_RESOLUTION_16BIT);
+	ltr.setResolution(LTR390_RESOLUTION_20BIT);
 	Serial.print("Integration Time (ms): ");
 	switch (ltr.getResolution())
 	{
@@ -127,6 +128,7 @@ void sensor_init()
 		Serial.println("Failed to set Integration Time");
 		break;
 	}
+	delay(200);
 
 	ltr.setThresholds(100, 1000); //Set the interrupt output threshold range for lower and upper.
 	if (ltr.getMode() == LTR390_MODE_ALS)
@@ -361,15 +363,15 @@ void loop(void)
         {
           Serial.printf("Lux Data:%0.2f-----Als Data:%d\r\n", ltr.getLUX(), ltr.readALS()); //calculate the lux
 
-          lux = ltr.getLUX();
-          als = ltr.readALS();
+          lux = ltr.getLUX()!=0?ltr.getLUX():lux;
+          als = ltr.readALS()!=0?ltr.getLUX():als;
         }
         else
         {
           Serial.printf("Uvi Data:%0.2f-----Uvs Data:%d\r\n", ltr.getUVI(), ltr.readUVS());
           
-          uvi = ltr.getUVI();
-          uvs = ltr.readUVS();
+          uvi = ltr.getUVI()!=0?ltr.getUVI():uvi;
+          uvs = ltr.readUVS()!=0?ltr.readUVS():uvs;
         }
       } else {
         Serial.println("Failed to read UV sensor :(");
